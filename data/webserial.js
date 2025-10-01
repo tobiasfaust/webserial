@@ -143,29 +143,38 @@ function MyCallback(json) {
  * Add a log line to the log area
  *****************************************************************/
 window.addLogLine = function(line) {
-      logLineCount++;
-      logRawLines.push(line);
+  logLineCount++;
+  logRawLines.push(line);
 
-      const logLinesDiv = document.getElementById('logLines');
-      // Create row number
-      const rowDiv = document.createElement('div');
-      rowDiv.className = 'log-row';
+  const logLinesDiv = document.getElementById('logLines');
+  if (!logLinesDiv) return; // safety
 
-      const rowNum = document.createElement('span');
-      rowNum.className = 'log-row-number';
-      rowNum.textContent = logLineCount;
+  // Prüfen, ob der User aktuell ganz unten ist (bzw. fast unten).
+  // Nur wenn das der Fall ist, wird nach dem Einfügen automatisch gescrollt.
+  // (Ein kleiner Toleranzwert von 2px vermeidet Rundungsprobleme)
+  const wasAtBottom = (logLinesDiv.scrollTop + logLinesDiv.clientHeight) >= (logLinesDiv.scrollHeight - 2);
+  
+  // Create row number
+  const rowDiv = document.createElement('div');
+  rowDiv.className = 'log-row';
 
-      const rowContent = document.createElement('span');
-      rowContent.className = 'log-row-content';
-      rowContent.textContent = line;
+  const rowNum = document.createElement('span');
+  rowNum.className = 'log-row-number';
+  rowNum.textContent = logLineCount;
 
-      rowDiv.appendChild(rowNum);
-      rowDiv.appendChild(rowContent);
+  const rowContent = document.createElement('span');
+  rowContent.className = 'log-row-content';
+  rowContent.textContent = line;
 
-      logLinesDiv.appendChild(rowDiv);
+  rowDiv.appendChild(rowNum);
+  rowDiv.appendChild(rowContent);
 
-      // Scroll to bottom
-      logLinesDiv.scrollTop = logLinesDiv.scrollHeight;
+  logLinesDiv.appendChild(rowDiv);
+
+  // Scroll to bottom
+  if (wasAtBottom) {
+    logLinesDiv.scrollTop = logLinesDiv.scrollHeight;
+  }
 };
 
 /*****************************************************************
